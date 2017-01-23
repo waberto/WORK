@@ -1,0 +1,103 @@
+ANTLR, outils et scripts
+========================
+
+Ce répertoire contient:
+
+* L'archive JAR de la version 3.5 d'ANTLR;
+* L'archive JAR de l'IDE ANTLRWorks 1.4.3 d'ANTLR;
+* Des scripts et makefiles Unix.
+
+L'utilisation en ligne de commande est recommandée car elle permet de
+bien comprendre ce qui se passe, surtout en cas d'erreur.
+
+Les interfaces graphiques (ANTLRWorks, plug-in Eclipse ANTLR IDE)
+sont parfois utiles, mais dû à des bugs et soucis d'installation,
+leur utilisation peut s'avérer coûteuse, surtout pour distinguer les
+erreurs dues à l'outil de celles dues à des grammaires incorrectes.
+
+
+Classpath
+---------
+
+Toutes les commandes qui manipulent des fichiers Java dépendant des 
+bibliothèques ANTLR doivent inclure le fichier JAR dans le classpath.
+Ceci est déjà fait dans les scripts/Makefiles; pour le faire manuellement,
+il suffit de :
+
+* modifier la variable d'environnement CLASSPATH pour inclure le fichier JAR:
+  export CLASSPATH=/chemin/vers/antlr-3.5.jar:$CLASSPATH
+
+* ou bien, ajouter l'option de ligne de commande `-cp` aux commandes 
+  `java`/`javac`, qui donne le même résultat :
+   java -cp /chemin/vers/antlr-3.5.jar:. <fichier.java>
+  (remarque : le CLASSPATH par défaut, quand non spécifié, est le répertoire
+  courant ('.'), donc il est souvent utile de le rajouter)
+
+Les scripts fournis ne font que définir le classpath avant d'appeler les
+commandes standard.
+
+
+Scripts
+-------
+
+Dans l'ordre, l'utilisation des scripts sur une grammaire `TP.g` se fait de la façon suivante :
+
+`./g2java.sh TP.g`
+
+`./javac.sh`
+
+`./run.sh TP <paramètres>`
+
+Il est nécessaire de les relancer tous après chaque modification de la grammaire `TP.g`.
+
+
+Makefiles
+---------
+
+Des fichiers Makefile sont fournis comme exemple.
+Pour les utiliser, il faut utiliser la commande:
+
+    make -f /chemin/vers/Makefile <cible>
+
+Où <cible> désigne la tâche à exécuter (`parse` ou `run`).
+
+Exemple :
+
+    make -f /share/m1info/COMP/antlr/Makefile.combined parse
+
+Cette commande doit être exécutée depuis votre répertoire personnel
+contenant le fichier TP1.g.
+
+Pour lancer l'exécution du programme compilé, on utilise la cible `run`, en
+plus de fournir le fichier de test (on suppose que le main lit depuis STDIN).
+
+Exemple :
+
+    make -f /share/m1info/COMP/antlr/Makefile.combined run < tests/test1.ttl
+
+Note : si le fichier s'appelle exactement 'Makefile' et il est dans le
+répertoire courant, vous n'avez pas besoin de donner le nom du fichier.
+Exemple :
+
+    make run < tests/test1.ttl
+
+Pensez donc à le recopier dans votre répertoire de travail
+(et à renommer Makefile.combined vers Makefile si besoin).
+
+
+### Makefile par type de grammaire
+
+Le fichier `Makefile.combined` est destiné à des grammaires ANTLR combinées
+(un seul fichier `.g` pour parser + lexer), tandis que `Makefile` est destiné
+à des grammaires séparées (un fichier `*Parser.g` et un `*Lexer.g`).
+
+Pour que les Makefiles marchent correctement, il faut que les fichiers
+espectent des conventions de nom: 
+
+- pour une grammaire `${GRAM}.g`, la méthode `main` doit être dans `${GRAM}.java` ;
+- les grammaires séparées doivent s'appeler `${GRAM}Lexer.g` et `${GRAM}Parser.g`.
+
+Les cibles des fichiers sont : `parser` (défaut), pour compiler lexer + parser ;
+`run` pour lancer la méthode `main` dans `${GRAM}.java`; et `clean` pour nettoyer
+les fichiers temporaires.
+

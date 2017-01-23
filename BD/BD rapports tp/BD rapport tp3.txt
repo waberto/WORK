@@ -1,0 +1,96 @@
+3.1.a
+
+Une vue "inherently updatable" permet de modifier les tables de données de base.
+
+3.1.b
+
+ "you can create an INSTEAD OF trigger on any view to make it updatable."
+
+3.1.c
+
+AS SELECT
+
+3.2.a
+
+CREATE VIEW Policier AS 
+SELECT cote, titre, auteur FROM livre WHERE categorie = 'Policier';
+
+3.2.b
+
+CREATE VIEW Lecteur_Policier AS 
+SELECT lecteur.NOLECTEUR,NOM,ADRESSE,pret.COTE,DATEEMPRUNT,DATELIMITE
+FROM Lecteur, Policier, Pret
+WHERE lecteur.nolecteur = pret.nolecteur AND pret.cote = policier.cote;
+
+3.2.c
+
+CREATE VIEW Emprunts AS 
+SELECT pret.NOLECTEUR,pret.COTE,DATELIMITE
+FROM Lecteur, Pret
+WHERE lecteur.nolecteur = pret.nolecteur AND rendu = 'non';
+
+3.2.d
+
+CREATE VIEW Stats(NOLECTEUR,NBLIVRES) AS
+SELECT nolecteur, count(*) FROM pret GROUP BY nolecteur;
+
+3.3
+
+Emprunts est misajourable.
+Stats, Policier et Lecteur_Policier sont inmisajourables.
+
+3.4
+
+Pareil qu'au dessus
+
+3.5.a
+
+SELECT NOM FROM Lecteur_Policier WHERE DATEEMPRUNT = '06/01/2004';
+
+3.5.b
+
+SELECT DISTINCT nom FROM LECTEUR_POLICIER WHERE nolecteur IN (
+	SELECT nolecteur FROM policier, lecteur_policier WHERE policier.COTE = lecteur_policier.COTE
+	AND SUBSTR(policier.AUTEUR,LENGTH(policier.AUTEUR)-2) = 'tam'
+	GROUP BY nolecteur,dateemprunt HAVING COUNT(*) > 2);
+
+
+3.5.c
+
+SELECT nom FROM LECTEUR_POLICIER WHERE
+cote IN(
+	SELECT cote FROM LECTEUR_POLICIER WHERE nom = 'Gaspard Dupont')
+GROUP BY nom
+HAVING COUNT(*) = (SELECT COUNT(*) cote FROM LECTEUR_POLICIER WHERE nom = 'Gaspard Dupont');
+
+3.6
+
+UPDATE Policier
+SET TITRE = 'La Dame en Noir'
+WHERE COTE ='COLL05';
+
+La table LIVRE a bien été modifiée.
+
+3.7
+
+We cant insert into Policier because the category, which is NOT NULL, is missing (ie NULL).
+
+3.8
+
+CREATE TRIGGER PolicierInsertTrigger
+INSTEAD OF INSERT
+ON POLICIER
+BEGIN
+  INSERT INTO Livre VALUES(:NEW.cote,:NEW.titre,'Policier',:NEW.auteur);
+END;
+
+
+
+
+
+
+
+
+
+
+

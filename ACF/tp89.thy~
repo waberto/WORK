@@ -1,0 +1,144 @@
+theory tp89
+imports Main "~~/src/HOL/Library/Code_Target_Nat"
+begin
+
+(* 
+quickcheck_params [size=6,tester=narrowing,timeout=120,expect=no_counterexample]
+nitpick_params [timeout=120]
+*)
+
+type_synonym transid= "nat*nat*nat"
+
+datatype message= 
+  Pay transid nat  
+| Ack transid nat
+| Cancel transid
+
+type_synonym transaction= "transid * nat"
+
+(*Exercice 3-1*)
+datatype transBddElement = 
+    TransEnCours "transid*message*nat"
+  | TransAnnuler "transid"
+  | TransValider "transaction"
+  
+
+type_synonym transBdd= "transBddElement list"
+
+
+(*fonction auxiliaire permettant de recuperee l ident de la transaction en cours  dans transBdd*)
+fun trouverTrans :: "nat \<Rightarrow> transBddElement \<Rightarrow> bool"
+where
+ "trouverTrans ident (TransEnCours ((c,m,ident1),mess, am)) = (if (ident=ident1) then True else False)" |
+ "trouverTrans ident (TransAnnuler (c,m,ident1)) = (if (ident=ident1) then True else False)" |
+ "trouverTrans ident (TransValider ((c,m,ident1), am)) = (if (ident=ident1) then True else False)"
+
+
+(*Fonctions pour connaitre le type du message en cours dans transBdd*)
+(*Pour savoir si le dernier message etait un Pay*)
+fun messagePay :: "message \<Rightarrow> bool"
+where 
+  "messagePay (Pay transID am) = True" |
+  "messagePay (Cancel transID) = False" |
+  "messagePay (Ack transID am) =  False"
+
+
+(*Pour savoir si le dernier message etait un Ack*)
+fun messageAck :: "message \<Rightarrow> bool"
+where 
+  "messageAck (Pay transID am) = False" |
+  "messageAck (Cancel transID) = False" |
+  "messageAck (Ack transID am) =  True"
+
+
+(*Pour savoir si le dernier message etait un Annuler*)
+fun messageCancel :: "message \<Rightarrow> bool"
+where 
+  "messageCancel(Pay transID am) = False" |
+  "messageCancel (Cancel transID) = True" |
+  "messageCancel (Ack transID am) =  False"
+
+
+(*Fonction  VALIDANT une transaction apres  un PAY du client*)
+fun traiterElem :: "message \<Rightarrow> transBddElement \<Rightarrow> transBddElement"
+where
+  "traiterElem (Pay transID am) (TransEnCours (transID', mess, am1)) = 
+            (if (((messagePay mess) = True) \<and> (am > am1)) then (TransEnCours (transID, mess, am))
+            else (if(((messageAck mess) = True) \<and> (am \<ge> am1)) then (TransValider (transID, am))
+            else (if(((messageCancel mess) = True)) then (TransAnnuler transID)
+            else (TransEnCours (transID, mess, am)))))" |
+
+  "traiterElem (Pay transID am) (TransAnnuler transID') = (TransAnnuler transID')" |
+  "traiterElem (Pay transID am) (TransValider (transID', am1)) = (TransValider (transID', am1))" |
+  
+  "traiterElem (Ack transID am) (TransEnCours (transID', mess, am1)) = 
+               (if(((messageAck mess) = True) \<and> (am > am1)) then (TransEnCours (transID, mess, am1))
+              else (if(((messagePay mess) = True) \<and> (am1 \<ge> am)) then (TransValider (transID', am1))
+              else (if(((messageCancel mess) = True)) then (TransAnnuler transID')
+              else (TransEnCours (transID, mess, am)))))" |
+
+  "traiterElem (Ack transID am) (TransAnnuler transID') = (TransAnnuler transID')" |
+  "traiterElem (Ack transID am) (TransValider (transID', am1)) = (TransValider (transID', am1))" |
+
+  "traiterElem (Cancel transID) (TransAnnuler transID') = (TransAnnuler transID)" |
+  "traiterElem (Cancel transID) (TransValider (transID', am1)) =  (TransAnnuler transID)" |
+  "traiterElem (Cancel transID) (TransEnCours (transID',mess, am1)) = (TransAnnuler transID)"
+
+(*Modifie la base de donnée en fonction des msgs reçus*)
+fun traiterMessage :: "message \<Rightarrow> transBdd \<Rightarrow> transBdd"
+where
+  "traiterMessage (Pay (c,m,ident) am) [] = [TransEnCours ((c,m,ident),(Pay (c,m,ident) am), am)]" |
+  "traiterMessage (Cancel (c,m,ident)) [] = [TransAnnuler (c,m,ident)]" |
+  "traiterMessage (Ack (c,m,ident) am) [] = [TransEnCours ((c,m,ident),(Ack (c,m,ident) am), am)] " |
+
+  "traiterMessage (Pay (c,m,ident) am) (x#xs) = 
+          (if ((trouverTrans ident x) = True) then (traiterElem (Pay (c,m,ident) am) x)#xs 
+           else (traiterMessage (Pay (c,m,ident) am) xs))"|
+
+  "traiterMessage (Cancel (c,m,ident)) (x#xs) = 
+          (if ((trouverTrans ident x) = True) then (traiterElem (Cancel (c,m,ident)) x)#xs 
+           else (traiterMessage (Cancel (c,m,ident)) xs))"|
+
+  "traiterMessage (Ack (c,m,ident) am) (x#xs) = 
+            (if ((trouverTrans ident x) = True) then (traiterElem (Ack (c,m,ident) am) x)#xs 
+           else (traiterMessage (Ack (c,m,ident) am) xs))"
+                                              
+(*Exercice 3-2*)
+(*Récupère les transactions valides *)
+fun export :: "transBdd \<Rightarrow> transaction list" 
+where
+  "export [] = []"|
+  "export (x#xs) = (case x of (TransValider (transID, am)) \<Rightarrow> (transID, am)#(export xs) | _ \<Rightarrow> (export xs))"
+
+(*Exercice 3-3*)
+ (*Crée une base de donnée à partir d'une liste de msgs *)
+fun traiterMessageList :: "message list \<Rightarrow> transBdd"
+where
+  "traiterMessageList [] = []"|
+  "traiterMessageList (x#xs) = (case x of (Pay transID am) \<Rightarrow> (TransEnCours (transID,(Pay transID am), am))#(traiterMessageList xs) |
+                               (Ack transID am) \<Rightarrow> (TransEnCours (transID,(Ack transID am), am))#(traiterMessageList xs)| 
+                               (Cancel transID) \<Rightarrow> (TransAnnuler transID)#(traiterMessageList xs))"
+ 
+
+
+
+(* ----- Exportation en Scala (Isabelle 2014) -------*)
+
+(* Suppression de l'export des abstract datatypes (Isabelle 2014) *)
+code_reserved Scala
+  message
+
+code_printing
+  type_constructor message \<rightharpoonup> (Scala) "message"
+  | constant Ack \<rightharpoonup> (Scala) "Ack"
+  | constant Pay \<rightharpoonup> (Scala) "Pay"
+  | constant Cancel \<rightharpoonup> (Scala) "Cancel"
+  | code_module "" \<rightharpoonup> (Scala)
+
+(* Directive d'exportation *)
+export_code export traiterMessage in Scala
+
+
+
+end
+

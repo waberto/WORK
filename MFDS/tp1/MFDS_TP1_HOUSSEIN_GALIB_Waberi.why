@@ -1,0 +1,116 @@
+theory HelloProof "My very first Why3 theory"
+
+  goal G1 : true
+
+  goal G2 : (false -> false) /\ (true \/ false)
+
+  use import int.Int
+
+  goal G3: forall x:int. x*x >= 0
+
+
+end
+
+
+theory Exercice2 "Preuve de formule logiques"
+
+	predicate a
+	predicate b
+	predicate p
+	predicate q
+	type t
+	predicate p' t
+
+	goal G1 : (a /\ b) -> (b /\ a)
+	
+	goal G2 : not(p /\ q) -> (not p \/ not q)
+	
+	goal G3 : not(exists x :t. p'(x)) -> (forall x :t. not p'(x))
+
+end
+
+theory Exercice3 "Modélisation logique"
+
+	type homme 
+	predicate mortel homme 
+
+	axiom R1 :  forall x:homme. mortel(x)
+	constant socrate:homme
+	goal G1: mortel(socrate)
+	
+end
+
+theory Exercice4 "puzzle logique"
+
+	type personne = A | B | C | D | E
+	predicate est_menteur personne 
+	predicate from_liarsville personne
+	predicate honest personne
+	predicate from_east personne
+	
+	
+	axiom R1: forall x:personne. from_liarsville(x) -> est_menteur(x)
+	axiom R2: exists x:personne. not from_liarsville(x) /\ forall y:personne. not from_liarsville(y) -> x=y
+	axiom R3: honest(A) -> est_menteur(A)
+	axiom R4: est_menteur(B) -> from_liarsville(D)
+	axiom R5: from_liarsville(C) -> est_menteur(C)
+	axiom R6: from_liarsville(D) -> not est_menteur(D)
+	axiom R7: from_east(E) -> est_menteur(E)
+
+	goal G1: not from_liarsville(A)
+	goal G2: not from_liarsville(B)
+	goal G3: not from_liarsville(C)
+	goal G4: not from_liarsville(D)
+	goal G5: not from_liarsville(E)
+	
+end
+
+
+(*
+theory Exercice4_2 "Question2 puzzle logique"
+    
+    predicate a_ment
+    predicate b_ment
+    predicate c_ment 
+    predicate d_ment
+    predicate e_ment
+    predicate from_liarsville 
+	predicate honest 
+	predicate from_east 
+    
+	axiom R1: honest -> a_ment
+	axiom R2: b_ment -> from_liarsville
+	axiom R3: from_liarsville -> c_ment
+	axiom R4: from_liarsville -> not d_ment
+	axiom R5: from_east -> e_ment
+
+    
+    goal G1: not from_liarsville = not a_ment
+	goal G2: not from_liarsville = not b_ment
+	goal G3: not from_liarsville = not c_ment
+	goal G4: not from_liarsville = not d_ment
+	goal G5: not from_liarsville = not e_ment
+
+end
+*)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

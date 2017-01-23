@@ -1,0 +1,33 @@
+module Todo
+  use import int.Int
+  use import matrix.Matrix as Mx
+  use import matrix.Syntax 
+
+  type mint = matrix int 
+
+  let test () = 
+	let m = make 2 2 0 in
+	Mx.set m (0,0) 2;
+	assert { Mx.rows m = 2};
+	assert {Mx.columns m = 2};
+	assert {Mx.get m (0,0) = 2};
+	assert {Mx.get m (0,1) = 0};
+	assert {Mx.get m (1,0) = 0};
+	assert {Mx.get m (1,1) = 0};
+  ()   
+
+  function taille (m: mint) : int = m.rows * m.columns
+
+ let 
+ predicate ttes_cases_sauf_une (m: matrix int) = forall i:index. valid_index m i -> m 
+end
+
+module Somme
+  use import int.Int
+  use import matrix.Matrix as Mx
+  use import map.MapSum as M
+  use import Todo
+
+  function somme_ligne1 (m:mint) : int = 0 
+
+end 

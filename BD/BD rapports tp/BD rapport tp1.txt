@@ -1,0 +1,176 @@
+I-
+6)
+scramble.data a 100 000 lignes
+
+7)
+SELECT * FROM XXXX where dist_10=1 rend 100 000/10 = 10 000 lignes
+SELECT * FROM XXXX where dist_1000=1 rend 100 000/1 000 = 100 lignes
+
+II-
+1) creation de la table XXXX
+3) chargement des données situées dans scramble.data vers la table XXXX
+
+
+III-
+3) le resultat de la requete est 1 n-uplet
+
+NSS
+----------
+NOM
+--------------------------------------------------------------------------------
+   DIST_10   DIST_100  DIST_1000 DIST_10000	RANDOM
+---------- ---------- ---------- ---------- ----------
+     21954
+ABCDEFGHIQWERTYUIOPOIUYTREWQASWEDFRQZXVFFGTREDDDDS876675327643763QWERTYUIOPLKJHG
+FDSA1150
+	 4	   54	     954       1954 17332.4781
+
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 1706117570
+
+--------------------------------------------------------------------------
+| Id  | Operation	      | Name | Rows  | Bytes | Cost (%CPU)| Time	 |
+--------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |	     |    19 |  2470 |   478   (1)| 00:00:06 |
+|*  1 |  TABLE ACCESS FULL| XXXX |    19 |  2470 |   478   (1)| 00:00:06 |  -
+--------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - filter("NSS"=21954)
+
+Note
+-----
+   - dynamic sampling used for this statement (level=2)
+
+
+Statistics
+----------------------------------------------------------
+	  0  recursive calls
+	  0  db block gets
+       1719  consistent gets
+	  0  physical reads
+	  0  redo size
+       1048  bytes sent via SQL*Net to client
+	523  bytes received via SQL*Net from client
+	  2  SQL*Net roundtrips to/from client
+	  0  sorts (memory)
+	  0  sorts (disk)
+	  1  rows processed
+
+IV-
+1) le script point_query recherche 1 n-uplet par requete
+   le script range_query recherche 99 n-uplets par requete grace a la selection sur intervalle
+2) le script bash boucle et accede aux valeurs d'une sequence stockée contrairement au script sql, le script sql devrait etre plus efficace
+3) exec @point_query.sql  = sys	0m0.024s
+   exec @p_q_mauvais.bash = sys	0m0.705s
+   exec @range_query.sql  = sys	0m0.071s
+
+   le temps d'execution de range_query est du meme ordre de grandeur que celui de point_query car pas d'indexation donc FULL ACCESS a chaque fois
+4)
+
+V-
+1)
+SELECT * FROM XXXX WHERE nss=21954;
+
+  		OPERATION  	 OBJECT_NAME  	 CARDINALITY  	 COST 
+	 SELECT STATEMENT 						2497  	 0 
+    	
+	 TABLE ACCESS (HASH)	 XXXX			2497  	   
+    	    	
+	 Access Predicates 
+    	    	    	
+	 	NSS=20327 
+
+---------------------------------------------------
+SELECT * FROM XXXX where nss>16873 and nss<16973 ;
+
+
+   		OPERATION  	 OBJECT_NAME  	 CARDINALITY  	 COST 
+	 SELECT STATEMENT	 					 99  	 1 
+    	
+	 TABLE ACCESS (HASH) 	XXXX  			 99  	 1 
+    	    	
+	 INDEX 		XXXX_PRIM_KEY_NSS 		 	 99  	 1 
+    	    	    	
+	 Access Predicates 
+    	    	    	    	
+	 AND 
+    	    	    	    	    	
+		 NSS>1932 
+    	    	    	    	    	
+		 NSS<2032 
+
+-------------------------------------------------------
+
+Pour point_query.sql les plans d'execution sont les mêmes que pour la première requête du V-1) (au nss près) mais répété.
+
+------------------------------------------------------
+
+Pour range_query.sql les plans d'execution sont les mêmes que pour la deuxième requête du V-1) (aux nss près) mais répété.
+
+2)
+Definition du hash cluster decrivant les caractéristiques physiques de XXXX.
+Ensuite création de la table XXXX.
+
+3)
+SELECT * FROM XXXX WHERE nss=21954;
+	  1  consistent gets
+	  0  physical reads
+
+---------------------------------------------------
+SELECT * FROM XXXX where nss>16873 and nss<16973 ;
+
+	108  consistent gets
+	  0  physical reads
+
+
+VI-
+1)
+SELECT * FROM XXXX WHERE nss=21954;
+
+		 OPERATION  	 OBJECT_NAME  	 CARDINALITY  	 COST 
+	 SELECT STATEMENT 					    	 1  	 0 
+    	
+	 TABLE ACCESS 				XXXX		  	 1  	 0 
+		(BY INDEX ROWID)
+    	    	
+	 INDEX (UNIQUE SCAN) XXXX_IX_NSS  			 1  	 0 
+    	    	    	
+	 Access Predicates 
+---------------------------------------------------
+SELECT * FROM XXXX where nss>16873 and nss<16973 ;
+
+		OPERATION  	 OBJECT_NAME  	 CARDINALITY  	 COST 
+	 SELECT STATEMENT						 1  	 0 
+    	
+	 TABLE ACCESS			XXXX   			 1  	 0 
+		 (BY INDEX ROWID)
+    	    	
+	 INDEX 			XXXX_PRIM_KEY_NSS  	 	1  		 0 
+	     (RANGE SCAN)
+    	    	    	
+	 Access Predicates 
+    	    	    	    	
+	 	AND 
+    	   NSS>1932 
+    	   NSS<2032 
+
+-------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

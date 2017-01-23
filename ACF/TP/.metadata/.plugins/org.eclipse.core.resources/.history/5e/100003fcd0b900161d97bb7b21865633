@@ -1,0 +1,193 @@
+package validator.Houssein;
+import bank._
+
+
+// Automatic conversion of bank.message to tp89.messages and Nat to bank.Nat
+object Converter{
+  implicit def bank2message(m:bank.message):tp89.message=
+    m match {
+    case bank.Pay((bank.Nat.Nata(c),(bank.Nat.Nata(m),bank.Nat.Nata(i))),bank.Nat.Nata(p)) => tp89.Pay((Nat.Nata(c),(Nat.Nata(m),Nat.Nata(i))),Nat.Nata(p))
+    case bank.Ack((bank.Nat.Nata(c),(bank.Nat.Nata(m),bank.Nat.Nata(i))),bank.Nat.Nata(p)) => tp89.Ack((Nat.Nata(c),(Nat.Nata(m),Nat.Nata(i))),Nat.Nata(p))
+    case bank.Cancel((bank.Nat.Nata(c),(bank.Nat.Nata(m),bank.Nat.Nata(i)))) => tp89.Cancel((Nat.Nata(c),(Nat.Nata(m),Nat.Nata(i))))
+  }
+  
+  implicit def trans2bankTrans(l:List[((Nat.nat,(Nat.nat,Nat.nat)),Nat.nat)]): List[((bank.Nat.nat,(bank.Nat.nat,bank.Nat.nat)),bank.Nat.nat)]=
+    l match {
+    case Nil => Nil
+    case ((Nat.Nata(c),(Nat.Nata(m),Nat.Nata(i))),Nat.Nata(p))::r => ((bank.Nat.Nata(c),(bank.Nat.Nata(m),bank.Nat.Nata(i))),bank.Nat.Nata(p))::trans2bankTrans(r)
+  }
+}
+
+import Converter._
+
+object Code_Numeral {
+
+def integer_of_nat(x0: Nat.nat): BigInt = x0 match {
+  case Nat.Nata(x) => x
+}
+
+} /* object Code_Numeral */
+
+object Nat {
+
+abstract sealed class nat
+final case class Nata(a: BigInt) extends nat
+
+def less_nat(m: nat, n: nat): Boolean =
+  Code_Numeral.integer_of_nat(m) < Code_Numeral.integer_of_nat(n)
+
+def equal_nat(m: nat, n: nat): Boolean =
+  Code_Numeral.integer_of_nat(m) == Code_Numeral.integer_of_nat(n)
+
+def less_eq_nat(m: nat, n: nat): Boolean =
+  Code_Numeral.integer_of_nat(m) <= Code_Numeral.integer_of_nat(n)
+
+} /* object Nat */
+
+object Product_Type {
+
+def equal_bool(p: Boolean, pa: Boolean): Boolean = (p, pa) match {
+  case (p, true) => p
+  case (p, false) => ! p
+  case (true, p) => p
+  case (false, p) => ! p
+}
+
+} /* object Product_Type */
+
+object tp89 {
+
+abstract sealed class message
+final case class Pay(a: (Nat.nat, (Nat.nat, Nat.nat)), b: Nat.nat) extends
+  message
+final case class Ack(a: (Nat.nat, (Nat.nat, Nat.nat)), b: Nat.nat) extends
+  message
+final case class Cancel(a: (Nat.nat, (Nat.nat, Nat.nat))) extends message
+
+abstract sealed class transBddEtat
+final case class
+  TransactionEnCours(a: ((Nat.nat, (Nat.nat, Nat.nat)), (message, Nat.nat)))
+  extends transBddEtat
+final case class TransactionAnnuler(a: (Nat.nat, (Nat.nat, Nat.nat))) extends
+  transBddEtat
+final case class TransactionValider(a: ((Nat.nat, (Nat.nat, Nat.nat)), Nat.nat))
+  extends transBddEtat
+
+def export(x0: List[transBddEtat]):
+      List[((Nat.nat, (Nat.nat, Nat.nat)), Nat.nat)]
+  =
+  x0 match {
+  case Nil => Nil
+  case x :: xs =>
+    (x match {
+       case TransactionEnCours(_) => export(xs)
+       case TransactionAnnuler(_) => export(xs)
+       case TransactionValider((transID, am)) => (transID, am) :: export(xs)
+     })
+}
+
+def TransId(ident: Nat.nat, x1: transBddEtat): Boolean = (ident, x1) match {
+  case (ident, TransactionEnCours(((c, (m, ident1)), (mess, am)))) =>
+    (if (Nat.equal_nat(ident, ident1)) true else false)
+  case (ident, TransactionAnnuler((c, (m, ident1)))) =>
+    (if (Nat.equal_nat(ident, ident1)) true else false)
+  case (ident, TransactionValider(((c, (m, ident1)), am))) =>
+    (if (Nat.equal_nat(ident, ident1)) true else false)
+}
+
+def messageAck(x0: message): Boolean = x0 match {
+  case Pay(transID, am) => false
+  case Cancel(transID) => false
+  case Ack(transID, am) => true
+}
+
+def messagePay(x0: message): Boolean = x0 match {
+  case Pay(transID, am) => true
+  case Cancel(transID) => false
+  case Ack(transID, am) => false
+}
+
+def messageCancel(x0: message): Boolean = x0 match {
+  case Pay(transID, am) => false
+  case Cancel(transID) => true
+  case Ack(transID, am) => false
+}
+
+def traiterElem(x0: message, x1: transBddEtat): transBddEtat = (x0, x1) match {
+  case (Pay(transIDa, am), TransactionEnCours((transID, (mess, am1)))) =>
+    (if (Product_Type.equal_bool(messagePay(mess), true) &&
+           Nat.less_nat(am1, am))
+      TransactionEnCours((transIDa, (mess, am)))
+      else (if (Product_Type.equal_bool(messageAck(mess), true) &&
+                  Nat.less_eq_nat(am1, am))
+             TransactionValider((transIDa, am))
+             else (if (Product_Type.equal_bool(messageCancel(mess), true))
+                    TransactionAnnuler(transIDa)
+                    else TransactionEnCours((transIDa, (mess, am))))))
+  case (Pay(transIDa, am), TransactionAnnuler(transID)) =>
+    TransactionAnnuler(transID)
+  case (Pay(transIDa, am), TransactionValider((transID, am1))) =>
+    TransactionValider((transID, am1))
+  case (Ack(transIDa, am), TransactionEnCours((transID, (mess, am1)))) =>
+    (if (Product_Type.equal_bool(messageAck(mess), true) &&
+           Nat.less_nat(am1, am))
+      TransactionEnCours((transIDa, (mess, am1)))
+      else (if (Product_Type.equal_bool(messagePay(mess), true) &&
+                  Nat.less_eq_nat(am, am1))
+             TransactionValider((transID, am1))
+             else (if (Product_Type.equal_bool(messageCancel(mess), true))
+                    TransactionAnnuler(transID)
+                    else TransactionEnCours((transIDa, (mess, am))))))
+  case (Ack(transIDa, am), TransactionAnnuler(transID)) =>
+    TransactionAnnuler(transID)
+  case (Ack(transIDa, am), TransactionValider((transID, am1))) =>
+    TransactionValider((transID, am1))
+  case (Cancel(transIDa), TransactionAnnuler(transID)) =>
+    TransactionAnnuler(transIDa)
+  case (Cancel(transIDa), TransactionValider((transID, am1))) =>
+    TransactionAnnuler(transIDa)
+  case (Cancel(transIDa), TransactionEnCours((transID, (mess, am1)))) =>
+    TransactionAnnuler(transIDa)
+}
+
+def traiterMessage(x0: message, x1: List[transBddEtat]): List[transBddEtat] =
+  (x0, x1) match {
+  case (Pay((c, (m, ident)), am), Nil) =>
+    List(TransactionEnCours(((c, (m, ident)), (Pay((c, (m, ident)), am), am))))
+  case (Cancel((c, (m, ident))), Nil) =>
+    List(TransactionAnnuler((c, (m, ident))))
+  case (Ack((c, (m, ident)), am), Nil) =>
+    List(TransactionEnCours(((c, (m, ident)), (Ack((c, (m, ident)), am), am))))
+  case (Pay((c, (m, ident)), am), x :: xs) =>
+    (if (Product_Type.equal_bool(TransId(ident, x), true))
+      traiterElem(Pay((c, (m, ident)), am), x) :: xs
+      else traiterMessage(Pay((c, (m, ident)), am), xs))
+  case (Cancel((c, (m, ident))), x :: xs) =>
+    (if (Product_Type.equal_bool(TransId(ident, x), true))
+      traiterElem(Cancel((c, (m, ident))), x) :: xs
+      else traiterMessage(Cancel((c, (m, ident))), xs))
+  case (Ack((c, (m, ident)), am), x :: xs) =>
+    (if (Product_Type.equal_bool(TransId(ident, x), true))
+      traiterElem(Ack((c, (m, ident)), am), x) :: xs
+      else traiterMessage(Ack((c, (m, ident)), am), xs))
+}
+
+} /* object tp89 */
+
+
+
+/* The object to complete */ 
+class ConcreteValidator extends TransValidator{
+  var bdd:...=...
+	// TODO
+	def process(m:message){
+    bdd=tra
+  }
+
+	// TODO
+	def getValidTrans=
+
+	// TODO
+	def authors= "Houssein"
+}
+

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename package &apos;validator.iciLeNomDeVotreBinome&apos; to &apos;validator.Houssein&apos;&#x0A;- Original project: &apos;TP89&apos;&#x0A;- Original element: &apos;TP89/src/validator.iciLeNomDeVotreBinome&apos;&#x0A;- Renamed element: &apos;TP89/src/validator.Houssein&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename package &apos;validator.iciLeNomDeVotreBinome&apos;" flags="589830" hierarchical="false" id="org.eclipse.jdt.ui.rename.package" input="/src&lt;validator.iciLeNomDeVotreBinome" name="validator.Houssein" qualified="false" references="true" stamp="1480430344853" textual="false" version="1.0"/>
+</session>

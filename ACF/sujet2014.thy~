@@ -1,0 +1,94 @@
+theory jules
+imports Main 
+begin
+
+datatype digit = Zero | Uno
+type_synonym bin = "digit list"
+
+(* exam seconde session 2013/2014*)
+fun powmaison :: "nat \<Rightarrow> nat \<Rightarrow> nat"
+where
+"powmaison nombre 0 =  1" |
+"powmaison 0 a = 0" |
+"powmaison a b =  a * (powmaison a (b - 1))"
+
+value "(powmaison 2 2)"
+
+fun bin2natAux::"bin \<Rightarrow> nat \<Rightarrow> nat"
+where
+(* 1 0 1 = 5*)
+ "bin2natAux [] res = res " |
+ "bin2natAux (e#l) res = (
+ if (e = Zero) 
+ then (bin2natAux l res)
+ else  (bin2natAux l (res + 
+          (powmaison 2 (List.length l))
+        )
+      )
+) "
+
+fun bin2natAuxInv::"bin \<Rightarrow> nat \<Rightarrow> nat"
+where
+(* 1 0 1 = 5*)
+ "bin2natAuxInv [] pow = 0 " |
+ "bin2natAuxInv (e#l) pow = (
+ if (e = Zero) 
+ then (bin2natAuxInv l (pow + 1))
+ else  (bin2natAuxInv l (pow + 1)) + 
+          (powmaison 2 pow)
+      )
+ "
+
+fun nat2int::"nat \<Rightarrow> int"
+where
+"nat2int 0 = 0" |
+"nat2int (Suc e) = 1 + (nat2int e)"
+
+fun bin2nat::"bin \<Rightarrow> nat"
+where
+ "bin2nat l =  bin2natAuxInv l 0 "
+
+value "nat2int(bin2nat [Uno, Zero, Zero, Zero])"
+value "nat2int(bin2nat [Zero, Zero, Zero, Uno])"
+
+
+fun resteBin:: "nat \<Rightarrow> digit"
+where 
+"resteBin nb = (if (nb mod 2) = 0 then Zero else Uno)"
+
+
+fun nat2binAux:: "nat \<Rightarrow> bin \<Rightarrow> bin"
+where
+"nat2binAux 0 bins = bins" |
+"nat2binAux nombre bins = (resteBin nombre)#(nat2binAux (nombre div 2) bins)"
+  
+
+fun nat2bin::"nat \<Rightarrow> bin"
+where
+"nat2bin nb = nat2binAux nb [] "
+
+value "nat2bin 8"
+
+fun addBin::"bin \<Rightarrow> bin \<Rightarrow> bin"
+where
+"addBin [] [] = []" | 
+"addBin [] b = b" | 
+"addBin b [] = b" |
+"addBin (Zero#b1) (Zero#b2) = Zero#(addBin b1 b2)" |
+"addBin (Uno#b1) (Zero#b2) =  Uno#(addBin b1 b2)" |
+"addBin (Zero#b1) (Uno#b2) =  Uno#(addBin b1 b2)" |
+"addBin (Uno#b1) (Uno#b2) =   Zero#(addBin b1 (addBin [Uno] b2))" 
+
+definition "d1 = [Zero, Zero, Zero, Uno]"
+definition "d2 = [Uno, Zero, Zero, Uno]"
+definition "d3 = [Uno, Zero, Uno]"
+
+value "addBin d1 d2"
+value "addBin d1 d3"
+value "addBin d3 d1"
+
+(* Toute conversion effectuee est la bonne *)
+
+lemma bin2natLemma:""
+
+end

@@ -1,0 +1,146 @@
+theory tp89
+imports Main "~~/src/HOL/Library/Code_Target_Nat"
+begin
+
+(* 
+quickcheck_params [size=6,tester=narrowing,timeout=120]
+nitpick_params [timeout=120]
+*)
+
+type_synonym transid= "nat*nat*nat"
+
+datatype message= 
+  Pay transid nat  
+| Ack transid nat
+| Cancel transid
+
+type_synonym transaction= "transid * nat"
+
+(*Exercice 3-1*)
+
+
+datatype transBddEtat = 
+   EnCours "transid*message*nat"
+  | TransactionAnnuler "transid"
+  | TransactionValider "transid*nat"
+  
+
+type_synonym transBdd= "transBddEtat list"
+(* recupère l'ident de la transaction en cours *)
+fun equal:: "nat \<Rightarrow> transBddEtat \<Rightarrow> bool"
+where
+" equal ident (EnCours ((c,m,ident1), mess, am)) = (if (ident=ident1) then True else False)"|
+" equal ident (TransactionAnnuler (c,m,ident1)) = (if (ident=ident1) then True else False)"|
+" equal ident (TransactionValider ((c,m,ident1), am)) = (if (ident=ident1) then True else False)"
+
+
+
+(* Validation d'une transaction *)
+fun traiterMessageAux :: "message \<Rightarrow> transBddEtat \<Rightarrow> transBddEtat"
+where
+"traiterMessageAux (Pay t am) (EnCours (t1, mess, am1)) = 
+            (if ( mess = (Pay t1 am1) \<and> (am \<ge> am1) \<and> (am1 \<noteq> 0)) then (EnCours (t, mess, am))
+            else (if( mess = (Ack t1 am1) \<and> (am \<ge> am1) \<and>  (am1 \<noteq> 0) ) then (TransactionValider (t, am))
+            else (if(mess = (Cancel t1)) then (TransactionAnnuler t)
+            else (EnCours (t, mess, am)))))" |
+
+"traiterMessageAux (Pay t am) (TransactionAnnuler t1) = (TransactionAnnuler t1)" |
+"traiterMessageAux (Pay t am) (TransactionValider (t1, am1)) = (TransactionValider (t1, am1))" |
+
+"traiterMessageAux (Ack t am) (EnCours (t1, mess, am1)) = 
+            (if ( mess = (Ack t1 am1) \<and> (am > am1) \<and> (am1 \<noteq> 0)) then (EnCours (t, mess, am))
+            else (if( mess = (Pay t1 am1) \<and> (am \<ge> am1)  \<and> (am1 \<noteq> 0)  ) then (TransactionValider (t, am))
+            else (if(mess = (Cancel t1)) then (TransactionAnnuler t)
+            else (EnCours (t, mess, am)))))" |
+
+"traiterMessageAux (Ack t am) (TransactionAnnuler t1) = (TransactionAnnuler t1)" |
+"traiterMessageAux (Ack t am) (TransactionValider (t1, am1)) = (TransactionValider (t1, am1))" |
+  
+"traiterMessageAux (Cancel t) (TransactionAnnuler t1) = (TransactionAnnuler t)" |
+"traiterMessageAux (Cancel t) (TransactionValider (t1, am1)) =  (TransactionAnnuler t)" |
+"traiterMessageAux (Cancel t) (EnCours (t1,mess, am1)) = (TransactionAnnuler t)"
+
+
+(* Traitement des messages *)
+fun traiterMessage :: "message \<Rightarrow> transBdd \<Rightarrow> transBdd"
+where
+"traiterMessage (Cancel t) [] = [TransactionAnnuler t] "|
+"traiterMessage (Pay t am) [] = [EnCours (t,(Pay t am), am)]"|
+"traiterMessage (Ack t am) [] = [ EnCours (t, (Ack t am), am)]"|
+
+"traiterMessage (Pay (c,m,ident) am) (x#xs) = (if ((equal ident x) = True) then (traiterMessageAux (Pay (c,m,ident) am) x)#xs
+                                    else (traiterMessage (Pay (c,m,ident) am) xs)) "|
+
+"traiterMessage (Ack (c,m,ident) am) (x#xs) = (if ((equal ident x) = True) then (traiterMessageAux (Ack (c,m,ident) am) x)#xs
+                                    else (traiterMessage (Ack (c,m,ident) am) xs)) "|
+
+"traiterMessage (Cancel (c,m,ident)) (x#xs) = (if ((equal ident x) = True) then (traiterMessageAux (Cancel (c,m,ident)) x)#xs
+                                    else (traiterMessage (Cancel (c,m,ident)) xs)) "
+
+value "(traiterMessage (Pay (0,0,0) 1) [])"
+value "(traiterMessage (Ack (1,1,1) 2) [])"                                                 
+value "(traiterMessage (Cancel (1,1,1)) [])"   
+
+
+(*Construit la liste des transactions validées *)
+fun export :: "transBdd \<Rightarrow> transaction list" 
+where
+"export [] = [] "|
+"export ((EnCours (t,m,am))#xs) = (export xs) "|
+"export ((TransactionAnnuler t)#xs)= (export xs)"|
+"export ((TransactionValider (t,am))#xs) = (t,am)#(export xs)" 
+
+
+
+(* Permet de traiter une liste de message *)
+fun traiterMessageListAux2::"message list \<Rightarrow> transBdd \<Rightarrow> transBdd"
+where
+"traiterMessageListAux2 [] l = l"|
+"traiterMessageListAux2 (x#xs) l = traiterMessageListAux2 xs (traiterMessage x l)"
+
+fun traiterMessageList::"message list \<Rightarrow> transBdd"
+where
+"traiterMessageList l = traiterMessageListAux2 l []"
+
+
+definition "c1= (Pay (1,1,1) 10)"
+definition "c2= (Pay (1,1,1) 20)"
+definition "m1= (Ack (1,1,1) 9)"
+definition "m2= (Ack (1,1,1) 20)"
+definition "tr = traiterMessage m1 (traiterMessage c1 [])"
+definition "tr1 = traiterMessage m2 (traiterMessage c2 [])"
+value "tr"
+value "tr1"
+
+(*
+fun traiterMessageList1 :: "message list \<Rightarrow> transBdd"
+where
+  "traiterMessageList1 [] = []"|
+  "traiterMessageList1 (x#xs) = (case x of (Pay transID am) \<Rightarrow> (EnCours (transID,(Pay transID am), am))#(traiterMessageList1 xs) |
+                               (Ack transID am) \<Rightarrow> (EnCours (transID,(Ack transID am), am))#(traiterMessageList1 xs)| 
+                               (Cancel transID) \<Rightarrow> (TransactionAnnuler transID)#(traiterMessageList1 xs))"
+*)
+
+(* ----- Exportation en Scala (Isabelle 2014) -------*)
+
+(* Directive d'exportation *)
+(*export_code export traiterMessage in Scala*)
+
+(* 1] Toutes les transactions validées ont un montant strictement supérieur à 0 *)
+lemma lem1:"(List.member (export (traiterMessageList l)) (t,v)) \<longrightarrow> (v > 0) "
+quickcheck
+oops
+
+(* 2] Dans la liste de transactions validées, tout triplet (c,m,id) n'apparait qu'une seule fois *)
+lemma lem2:"  "
+
+
+
+
+
+
+
+end
+
+
+

@@ -1,0 +1,51 @@
+2016-11-29 15:38:09,501  WARN [ModalContext] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:38:09,510  WARN [ModalContext] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:38:11,036  WARN [ModalContext] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:38:11,037  WARN [ModalContext] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:38:16,420  WARN [Worker-4] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:38:16,431  WARN [Worker-4] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:38:25,772  WARN [Java indexing] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:38:25,773  WARN [Java indexing] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:39:05,143  WARN [Worker-8] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:39:05,143  WARN [Worker-8] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:39:05,391  WARN [Java indexing] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:39:05,392  WARN [Java indexing] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:40:02,777  WARN [Worker-7] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:40:02,777  WARN [Worker-7] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:40:16,874  WARN [Worker-4] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:40:16,874  WARN [Worker-4] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:45:17,398  WARN [Worker-8] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:45:17,398  WARN [Worker-8] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:47:20,642  WARN [org.scalaide.ui.internal.reconciliation.ScalaReconciler] - ImplicitHighlightingPresenter - Timeout while waiting for `askLoadedTyped` during semantic highlighting.
+2016-11-29 15:53:16,085  WARN [Worker-16] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:53:16,087  WARN [Worker-16] - ScalaProject - Project TP89 runs on platform default installation.
+2016-11-29 15:55:14,240  WARN [Worker-18] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-11-29 15:55:14,240  WARN [Worker-18] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:07:37,948  WARN [main] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:07:38,176  WARN [main] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:07:38,257  WARN [main] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:07:38,257  WARN [main] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:21:34,534 ERROR [Text Viewer Hover Presenter] - IScalaPresentationCompiler$ - Ignoring InterruptException
+2016-12-04 04:21:34,563 ERROR [Text Viewer Hover Presenter] - IScalaPresentationCompiler$ - Ignoring InterruptException
+2016-12-04 04:21:34,564 ERROR [Text Viewer Hover Presenter] - IScalaPresentationCompiler$ - Ignoring InterruptException
+2016-12-04 04:23:11,997  WARN [Worker-9] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:23:11,997  WARN [Worker-9] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:23:12,055  WARN [Worker-9] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:23:12,055  WARN [Worker-9] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:23:25,453  WARN [Worker-10] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:23:25,453  WARN [Worker-10] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:50:26,175  WARN [Worker-15] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:50:26,176  WARN [Worker-15] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-04 04:55:25,339  WARN [Worker-23] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-04 04:55:25,339  WARN [Worker-23] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-05 22:12:42,790  WARN [main] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-05 22:12:42,809  WARN [main] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-05 22:12:42,841  WARN [main] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-05 22:12:42,841  WARN [main] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-05 22:25:11,011  WARN [Worker-1] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-05 22:25:11,077  WARN [Worker-1] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-05 22:25:13,557  WARN [Worker-1] - ScalaProject - Project TP89 has platform default sourceLevel.
+2016-12-05 22:25:13,557  WARN [Worker-1] - ScalaProject - Project TP89 runs on platform default installation.
+2016-12-05 23:07:28,871 ERROR [Worker-18] - System.err - SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+2016-12-05 23:07:29,093 ERROR [Worker-18] - System.err - SLF4J: Defaulting to no-operation (NOP) logger implementation
+2016-12-05 23:07:29,093 ERROR [Worker-18] - System.err - SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
