@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<file name="../tp4-ex2-todo.mlw" expanded="true">
+<theory name="TabSum" sum="7529f75cddf88fb18fa39f1cceece1a9" expanded="true">
+ <goal name="WP_parameter somme_tab" expl="VC for somme_tab" expanded="true">
+ <proof prover="0"><result status="valid" time="0.04"/></proof>
+ </goal>
+</theory>
+<theory name="TestCase" sum="da5248f721b607750972780338b3709c" expanded="true">
+ <goal name="WP_parameter test_case" expl="VC for test_case" expanded="true">
+ <proof prover="0"><result status="valid" time="0.16"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

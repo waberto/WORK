@@ -1,0 +1,26 @@
+(*G1.2 HOUSSEIN GALIB*)
+module Termine
+
+  use import int.Int
+  use import ref.Ref
+
+  let f1 () = 
+    let n = ref 0 in
+    while !n < 100  do
+	invariant{ 0 <= !n <= 100 }
+	variant{100 - !n}
+      n := !n + 1
+    done;
+    !n
+
+  let f2 () =
+    let n = ref 100 in
+    while !n > 0  do
+	invariant{ 0 <= !n <= 100 }
+	variant{ !n }
+	n := !n - 1
+    done;
+    !n
+
+end
+

@@ -1,0 +1,23 @@
+(* Greatest common divisor, using the Euclidean algorithm *)
+
+module Ex4Iter
+
+  use import mach.int.Int
+  use import ref.Ref
+  use import number.Gcd
+
+  let pgcd_euclide (a b: int) : int
+  (* a completer *)
+
+end
+
+module Ex4Rec
+
+  use import mach.int.Int
+  use import number.Gcd
+
+  let rec pgcd_euclide (u v: int) : int
+   (* a completer *)
+
+end
+

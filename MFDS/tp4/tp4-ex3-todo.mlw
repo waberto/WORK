@@ -1,0 +1,34 @@
+(*G1.2 HOUSSEIN GALIB*)
+module Ex3
+
+  use import int.Int
+  use import ref.Refint
+
+  let madivision (a b: int) : int
+     requires{ a>=0 /\ b>=0}
+     ensures{ exists r:int. result*b + r = a /\ 0 <= r < b }
+	=
+	let q = ref 0 in
+	let r = ref a in 
+	while !r >= b do
+	invariant { !q * b + !r = a && 0 <= !r }
+	variant { !r }
+	incr q;
+     	r -= b
+
+    done;
+    !q
+
+
+end
+
+(*
+module MesTests
+
+  use import int.Int
+  use import Ex3
+  
+  let mon_test () =
+    (* a completer *)
+ 
+end*)

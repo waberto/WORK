@@ -1,0 +1,37 @@
+(*G1.2 HOUSSEIN GALIB*)
+module TabSum
+
+  use import int.Int
+  use import ref.Ref
+  use import array.Array
+  use import array.ArraySum
+
+  let somme_tab (t:array int):int =
+	ensures{ result = sum t 0 t.length }
+	let s = ref 0 in
+	for i = 0 to (t.length - 1) do
+		invariant{ !s = sum t 0 i }
+		s := !s + t[i]
+	done;
+	!s
+end				
+
+
+
+module TestCase
+
+  use import TabSum
+  use import array.Array
+  use import array.ArraySum
+
+  let test_case () =
+   let t = make 4 0 in
+	t[0] <- 1;
+	t[1] <- 2;
+	t[2] <- 3;
+	t[3] <- 4;
+	let a = somme_tab t in
+	assert{ a = 10 }		
+	
+
+end

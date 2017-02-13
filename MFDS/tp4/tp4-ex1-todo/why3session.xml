@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"http://why3.lri.fr/why3session.dtd">
+<why3session shape_version="4">
+<prover id="0" name="Alt-Ergo" version="0.99.1" timelimit="5" memlimit="1000"/>
+<file name="../tp4-ex1-todo.mlw" expanded="true">
+<theory name="Termine" sum="c362167f9fadf6a5774196e385873338" expanded="true">
+ <goal name="WP_parameter f1" expl="VC for f1" expanded="true">
+ <proof prover="0"><result status="valid" time="0.02"/></proof>
+ </goal>
+ <goal name="WP_parameter f2" expl="VC for f2" expanded="true">
+ <proof prover="0"><result status="unknown" time="0.01"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
