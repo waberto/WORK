@@ -1,0 +1,8 @@
+Sujet: http://ymaurel.com/MRI/tp_wireshark.pdf
+
+traceroute & whois: utiliser network-tools.com
+
+utilisez ifconfig ou ip addr
+
+partie wireshark, utilisez http://ymaurel.com au lieu de http://istic.univ-rennes1.fr
+(redirige vers du https)
